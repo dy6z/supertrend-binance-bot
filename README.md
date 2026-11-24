@@ -78,16 +78,16 @@ python3 ~/.hermes/scripts/binance_sl_watchdog.py
 
 ---
 
-## 🧠 Core Logic & Strategy
-1. **Trend & Retest Gate:** Evaluates 15-minute candlestick data across 26 configured perpetual symbols.
-2. **Filters:**
-   - Supertrend distance >= 2.0% from price.
-   - RSI neutral-zone filter `[35, 65]` (avoids extreme overbought/oversold whipsaws).
-   - Bollinger Bands (BB mid cross confirmation).
-3. **Execution & Risk Management:**
-   - Market order entry with predetermined position sizing ($20 margin, 10x leverage = $200 notional).
-   - Target Take Profit: **+1.8%**.
-   - Stop Loss: **-3.0%** hard stop / trailing Supertrend.
+## 💎 Key Unique Features
+1. **Signal Grading (Grade A & B):**
+   - **Grade A:** Fresh Supertrend flip within <= 1 candle, strong distance ($\ge 2.0\%$), RSI in safe neutral zone `[35, 65]`, and aligned with Bollinger Band mid-cross.
+   - **Grade B:** Valid setup meeting core Supertrend and RSI volatility gates across 2-3 bars.
+2. **Dynamic Trailing Stop Loss:**
+   - Stop Loss is not static; it dynamically trails the Supertrend line in real-time as price moves in favor, protecting open profits while cutting losses automatically at `-3.0%` hard stop.
+3. **Precision PnL Reconciliation & Alerts:**
+   - Real-time WhatsApp notifications featuring exact entry, exit, percentage return, and realized USD profit/loss (`userTrades` execution truth).
+4. **Autonomous Risk Guardrails:**
+   - Strict position sizing ($20 margin @ 10x leverage = $200 notional) with anti-duplicate execution locks and watchdog error suppression.
 
 ---
 
