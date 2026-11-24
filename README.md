@@ -105,7 +105,7 @@ python3 ~/.hermes/scripts/binance_sl_watchdog.py
 
 ---
 
-
+## ⚙️ Systemd Service Templates & Integration
 Persistent user `systemd` services with auto-restart enabled:
 
 ### Example Unit File (`~/.config/systemd/user/binance-auto-executor.service`):
@@ -135,7 +135,3 @@ journalctl -n 50 --user -u binance-auto-executor -f
 journalctl -n 50 --user -u binance-sl-watchdog -f
 journalctl -n 50 --user -u binance-profit-lock -f
 ```
-
----
-
-
