@@ -135,3 +135,8 @@ journalctl -n 50 --user -u binance-auto-executor -f
 journalctl -n 50 --user -u binance-sl-watchdog -f
 journalctl -n 50 --user -u binance-profit-lock -f
 ```
+
+---
+
+## 📄 License
+This project is open-sourced under the [MIT License](LICENSE).
