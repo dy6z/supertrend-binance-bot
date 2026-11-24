@@ -11,16 +11,45 @@ Automated Binance USDT-M Futures trading system based on Supertrend trend-follow
 
 ---
 
-## 📂 File Structure & Components
+## 📂 File Structure & Detailed Component Responsibilities
 ```text
 ~/.hermes/scripts/
-├── supertrend_bb_crypto_scanner.py   # Core market scanner (26 symbols, 15m TF, Supertrend + BB + RSI)
-├── binance_auto_executor.py          # Autonomous order execution daemon ($20 margin @ 10x)
-├── binance_auto_executor_loop.sh     # Shell loop wrapper running executor every 30 seconds
-├── binance_sl_watchdog.py            # Risk management watchdog (Trailing stops, hard SL -3%, TP +1.8%)
-├── binance_auto_ownership.py         # Position ownership & trade reconciliation validator
-└── README.md                         # Documentation
+├── supertrend_bb_crypto_scanner.py      # Core market scanner (26 symbols, 15m TF, Supertrend + BB + RSI)
+├── binance_auto_executor.py             # Autonomous order execution daemon ($20 margin @ 10x)
+├── binance_auto_executor_loop.sh        # Shell loop wrapper running executor every 30 seconds
+├── binance_sl_watchdog.py               # Risk management watchdog (Trailing stops, hard SL -3%, TP +1.8%)
+├── binance_profit_lock_watchdog.py      # Profit lock & reconciliation watchdog (Sends exact PnL % & USD alerts)
+├── binance_auto_ownership.py            # Position ownership & trade reconciliation validator
+└── README.md                            # Documentation
 ```
+
+### Detailed File Functions:
+1. **`supertrend_bb_crypto_scanner.py`**
+   - Fetches 15m candlestick data for 26 symbols from Binance Futures.
+   - Computes Supertrend lines, Bollinger Band mid-cross validation, and RSI neutral zone filter `[35, 65]`.
+   - Generates active signals and logs them to `supertrend_bb_signals.log`.
+
+2. **`binance_auto_executor.py`**
+   - Reads scanner signals and autonomously opens market positions on Binance Futures.
+   - Enforces strict risk sizing ($20 margin @ 10x leverage = $200 notional).
+   - Prevents duplicate orders and handles entry identity verification.
+
+3. **`binance_auto_executor_loop.sh`**
+   - Shell loop wrapper that runs `binance_auto_executor.py` continuously at 30-second intervals.
+
+4. **`binance_sl_watchdog.py`**
+   - Monitors open positions and manages Stop Loss orders in real-time.
+   - Implements trailing Supertrend stops and hard Stop Loss (`-3%`).
+   - Suppresses API error spam (such as `-2021` immediate trigger errors).
+
+5. **`binance_profit_lock_watchdog.py`**
+   - Tracks open and closed positions to provide 100% synchronized trade closure alerts.
+   - Fetches actual execution trades (`userTrades`) from Binance with retry logic.
+   - Computes exact weighted exit price, percentage return, and realized USD profit/loss.
+   - Sends formatted WhatsApp alerts (`🎯 TAKE PROFIT HIT` / `🛑 STOP LOSS HIT`) with exact PnL figures.
+
+6. **`binance_auto_ownership.py`**
+   - Validates position ownership and ensures all trades align with authorized strategy parameters before letting watchdogs touch them.
 
 ---
 
@@ -34,7 +63,6 @@ Automated Binance USDT-M Futures trading system based on Supertrend trend-follow
    - Market order entry with predetermined position sizing ($20 margin, 10x leverage = $200 notional).
    - Target Take Profit: **+1.8%**.
    - Stop Loss: **-3.0%** hard stop / trailing Supertrend.
-   - Watchdog safely handles order status checks, preventing duplicate triggers and suppressing immediate-trigger `-2021` error spam.
 
 ---
 
@@ -67,14 +95,16 @@ The system runs 24/7 in the background via persistent user `systemd` services wi
 
 - **Executor Service:** `binance-auto-executor.service`
 - **Watchdog Service:** `binance-sl-watchdog.service`
+- **Profit Lock Watchdog Service:** `binance-profit-lock.service`
 - **Scanner Loop Service:** `supertrend-bb-loop.service`
 
 ### Useful Systemd Commands:
 ```bash
 # Check status of all bot services
-systemctl --user status binance-auto-executor binance-sl-watchdog supertrend-bb-loop
+systemctl --user status binance-auto-executor binance-sl-watchdog binance-profit-lock supertrend-bb-loop
 
 # View live logs
 journalctl -n 50 --user -u binance-auto-executor -f
 journalctl -n 50 --user -u binance-sl-watchdog -f
+journalctl -n 50 --user -u binance-profit-lock -f
 ```
