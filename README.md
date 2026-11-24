@@ -11,11 +11,12 @@ Automated Binance USDT-M Futures trading system based on Supertrend trend-follow
 
 ---
 
-## 📂 File Structure
+## 📂 File Structure & Components
 ```text
 ~/.hermes/scripts/
 ├── supertrend_bb_crypto_scanner.py   # Core market scanner (26 symbols, 15m TF, Supertrend + BB + RSI)
 ├── binance_auto_executor.py          # Autonomous order execution daemon ($20 margin @ 10x)
+├── binance_auto_executor_loop.sh     # Shell loop wrapper running executor every 30 seconds
 ├── binance_sl_watchdog.py            # Risk management watchdog (Trailing stops, hard SL -3%, TP +1.8%)
 ├── binance_auto_ownership.py         # Position ownership & trade reconciliation validator
 └── README.md                         # Documentation
@@ -37,7 +38,7 @@ Automated Binance USDT-M Futures trading system based on Supertrend trend-follow
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start & Manual Execution
 
 ### 1. Prerequisites
 - Python 3.10+ with `pandas`, `ccxt`, and required scientific libraries.
@@ -49,20 +50,31 @@ Automated Binance USDT-M Futures trading system based on Supertrend trend-follow
 python3 ~/.hermes/scripts/supertrend_bb_crypto_scanner.py
 ```
 
-### 3. Run Executor
+### 3. Run Executor Loop
 ```bash
-python3 ~/.hermes/scripts/binance_auto_executor.py
+bash ~/.hermes/scripts/binance_auto_executor_loop.sh
 ```
 
-### 4. Run Watchdog
+### 4. Run Watchdog Manually
 ```bash
 python3 ~/.hermes/scripts/binance_sl_watchdog.py
 ```
 
 ---
 
-## ⚙️ Systemd & Auto-Start
-All daemons run persistently via user `systemd` services with auto-restart enabled:
-- `binance-auto-executor.service`
-- `binance-sl-watchdog.service`
-- `supertrend-bb-loop.service`
+## ⚙️ Systemd & Auto-Start Integration
+The system runs 24/7 in the background via persistent user `systemd` services with auto-restart enabled:
+
+- **Executor Service:** `binance-auto-executor.service`
+- **Watchdog Service:** `binance-sl-watchdog.service`
+- **Scanner Loop Service:** `supertrend-bb-loop.service`
+
+### Useful Systemd Commands:
+```bash
+# Check status of all bot services
+systemctl --user status binance-auto-executor binance-sl-watchdog supertrend-bb-loop
+
+# View live logs
+journalctl -n 50 --user -u binance-auto-executor -f
+journalctl -n 50 --user -u binance-sl-watchdog -f
+```
