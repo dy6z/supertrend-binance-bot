@@ -53,6 +53,16 @@ Automated Binance USDT-M Futures trading system based on Supertrend trend-follow
 
 ---
 
+## 🔑 Environment Variables & Credentials
+Create a credential file at `~/.agent/credentials/binance.env`:
+```env
+BINANCE_API_KEY=your_binance_api_key_here
+BINANCE_API_SECRET=your_binance_api_secret_here
+WHATSAPP_HOME_CHAT_ID=your_whatsapp_chat_id_here
+```
+
+---
+
 ## 🧠 Core Logic & Strategy
 1. **Trend & Retest Gate:** Evaluates 15-minute candlestick data across 26 configured perpetual symbols.
 2. **Filters:**
@@ -66,42 +76,44 @@ Automated Binance USDT-M Futures trading system based on Supertrend trend-follow
 
 ---
 
-## 🚀 Quick Start & Manual Execution
-
-### 1. Prerequisites
-- Python 3.10+ with `pandas`, `ccxt`, and required scientific libraries.
-- Binance Futures API credentials configured securely in:
-  `~/.agent/credentials/binance.env`
-
-### 2. Run Scanner Manually
-```bash
-python3 ~/.hermes/scripts/supertrend_bb_crypto_scanner.py
-```
-
-### 3. Run Executor Loop
-```bash
-bash ~/.hermes/scripts/binance_auto_executor_loop.sh
-```
-
-### 4. Run Watchdog Manually
-```bash
-python3 ~/.hermes/scripts/binance_sl_watchdog.py
-```
+## 🗂️ Local State Files
+- `supertrend_bb_state.json`: Latest scanner state and signal cache.
+- `auto_executor_state.json`: Executed orders and active symbol cache.
+- `watchdog_track_state.json`: Position state tracked by watchdogs for PnL reconciliation.
 
 ---
 
-## ⚙️ Systemd & Auto-Start Integration
-The system runs 24/7 in the background via persistent user `systemd` services with auto-restart enabled:
+## 🛠️ Troubleshooting & Common Binance Error Codes
+- **`-2021` (Order would immediately trigger):** Trigger price is too close to market price (handled gracefully by watchdog).
+- **`-1021` (Timestamp outside recvWindow):** System time desync with Binance servers. Run NTP sync (`timedatectl set-ntp true`).
+- **`-4120` (Algo order rejection):** Precision/tick size mismatch (handled via CCXT price rounding).
 
-- **Executor Service:** `binance-auto-executor.service`
-- **Watchdog Service:** `binance-sl-watchdog.service`
-- **Profit Lock Watchdog Service:** `binance-profit-lock.service`
-- **Scanner Loop Service:** `supertrend-bb-loop.service`
+---
 
-### Useful Systemd Commands:
+## ⚙️ Systemd Service Templates & Integration
+Persistent user `systemd` services with auto-restart enabled:
+
+### Example Unit File (`~/.config/systemd/user/binance-auto-executor.service`):
+```ini
+[Unit]
+Description=Binance Auto Executor (Supertrend Strategy)
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /home/dy6z/.hermes/scripts/binance_auto_executor.py
+Restart=always
+RestartSec=15
+
+[Install]
+WantedBy=default.target
+```
+
+### Useful Commands:
 ```bash
-# Check status of all bot services
-systemctl --user status binance-auto-executor binance-sl-watchdog binance-profit-lock supertrend-bb-loop
+# Enable and start services
+systemctl --user daemon-reload
+systemctl --user enable --now binance-auto-executor binance-sl-watchdog binance-profit-lock supertrend-bb-loop
 
 # View live logs
 journalctl -n 50 --user -u binance-auto-executor -f
