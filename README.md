@@ -105,8 +105,7 @@ python3 ~/.hermes/scripts/binance_sl_watchdog.py
 
 ---
 
-## 📄 License
-This project is open-sourced under the [MIT License](LICENSE).
+
 Persistent user `systemd` services with auto-restart enabled:
 
 ### Example Unit File (`~/.config/systemd/user/binance-auto-executor.service`):
@@ -139,5 +138,4 @@ journalctl -n 50 --user -u binance-profit-lock -f
 
 ---
 
-## 📄 License
-This project is open-sourced under the [MIT License](LICENSE).
+
