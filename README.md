@@ -53,12 +53,27 @@ Automated Binance USDT-M Futures trading system based on Supertrend trend-follow
 
 ---
 
-## 🔑 Environment Variables & Credentials
-Create a credential file at `~/.agent/credentials/binance.env`:
-```env
-BINANCE_API_KEY=your_binance_api_key_here
-BINANCE_API_SECRET=your_binance_api_secret_here
-WHATSAPP_HOME_CHAT_ID=your_whatsapp_chat_id_here
+## 🚀 Quick Start
+
+### 1. Prerequisites & Credentials
+- Python 3.10+ with `pandas`, `ccxt`, and required scientific libraries.
+- Create your Binance API credential file at `~/.agent/credentials/binance.env`:
+  ```env
+  BINANCE_API_KEY=your_binance_api_key_here
+  BINANCE_API_SECRET=your_binance_api_secret_here
+  WHATSAPP_HOME_CHAT_ID=your_whatsapp_chat_id_here
+  ```
+
+### 2. Manual Test Runs
+```bash
+# Run Market Scanner
+python3 ~/.hermes/scripts/supertrend_bb_crypto_scanner.py
+
+# Run Executor Loop
+bash ~/.hermes/scripts/binance_auto_executor_loop.sh
+
+# Run SL Watchdog
+python3 ~/.hermes/scripts/binance_sl_watchdog.py
 ```
 
 ---
