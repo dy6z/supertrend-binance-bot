@@ -99,6 +99,24 @@ python3 ~/.hermes/scripts/binance_sl_watchdog.py
 ---
 
 ## 🛠️ Troubleshooting & Common Binance Error Codes
+- **Network Timeouts / `SCANNER BLIND` / `SCANNER DEGRADED`:** Connection timeouts to `fapi.binance.com` are typically caused by cloud provider IP geo-blocking.
+  - **Solution (Cloudflare WARP):**
+    1. Install Cloudflare WARP:
+       ```bash
+       curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | sudo gpg --yes --dearmor -o /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
+       echo "deb [signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/cloudflare-client.list
+       sudo apt-get update && sudo apt-get install -y cloudflare-warp
+       ```
+    2. Register and connect:
+       ```bash
+       warp-cli --accept-tos registration new
+       warp-cli --accept-tos connect
+       ```
+    3. Verify connection:
+       ```bash
+       warp-cli status
+       curl -s https://fapi.binance.com/fapi/v1/time
+       ```
 - **`-2021` (Order would immediately trigger):** Trigger price is too close to market price (handled gracefully by watchdog).
 - **`-1021` (Timestamp outside recvWindow):** System time desync with Binance servers. Run NTP sync (`timedatectl set-ntp true`).
 - **`-4120` (Algo order rejection):** Precision/tick size mismatch (handled via CCXT price rounding).
